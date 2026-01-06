@@ -141,6 +141,29 @@
     font-family: var(--font-sans);
   }
 
+  /* Viewport-safe hero height (prevents mobile browser UI overflow) */
+  .hero-viewport {
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+  }
+
+  @supports (height: 100svh) {
+    .hero-viewport {
+      height: 100svh;
+      min-height: 100svh;
+      max-height: 100svh;
+    }
+  }
+
+  @supports (height: 100dvh) {
+    .hero-viewport {
+      height: 100dvh;
+      min-height: 100dvh;
+      max-height: 100dvh;
+    }
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent;
     background-image: var(--gradient-primary);
