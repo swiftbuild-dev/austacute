@@ -80,17 +80,17 @@ export const Hero = () => {
 
   const transitionToSlide = useCallback((targetIndex: number) => {
     if (targetIndex === current || nextIndex !== null) return;
-    
+
     preloadNextImage(targetIndex);
-    
+
     // Start transition - show next image layer
     setNextIndex(targetIndex);
-    
+
     // After transition completes, update current and reset
     if (transitionTimeoutRef.current) {
       clearTimeout(transitionTimeoutRef.current);
     }
-    
+
     transitionTimeoutRef.current = setTimeout(() => {
       setCurrent(targetIndex);
       setNextIndex(null);
@@ -128,22 +128,21 @@ export const Hero = () => {
   return (
     <section
       id="home"
-      className="relative h-screen w-full max-w-full overflow-x-hidden bg-neutral-900"
+      className="relative h-screen w-full overflow-hidden bg-neutral-900"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Image Container - Layered crossfade approach prevents blank state */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 w-full h-full">
         {/* Current image - always visible as base layer, fades out during transition */}
         <motion.div
           key={`current-${current}`}
           initial={false}
           animate={{ opacity: nextIndex !== null ? 0 : 1 }}
           transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
-          className="absolute inset-0"
-          style={{ 
+          className="absolute inset-0 w-full h-full"
+          style={{
             willChange: 'opacity',
-            backfaceVisibility: 'hidden',
             transform: 'translateZ(0)' // GPU acceleration
           }}
         >
@@ -151,11 +150,9 @@ export const Hero = () => {
             src={slides[current].image}
             alt={slides[current].title}
             className="w-full h-full object-cover"
-            style={{ 
+            style={{
               willChange: 'opacity',
-              backfaceVisibility: 'hidden',
               transform: 'translateZ(0)', // GPU acceleration
-              maxWidth: '100%',
               display: 'block'
             }}
           />
@@ -168,10 +165,9 @@ export const Hero = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute inset-0"
-            style={{ 
+            className="absolute inset-0 w-full h-full"
+            style={{
               willChange: 'opacity',
-              backfaceVisibility: 'hidden',
               transform: 'translateZ(0)' // GPU acceleration
             }}
           >
@@ -179,11 +175,9 @@ export const Hero = () => {
               src={slides[nextIndex].image}
               alt={slides[nextIndex].title}
               className="w-full h-full object-cover"
-              style={{ 
+              style={{
                 willChange: 'opacity',
-                backfaceVisibility: 'hidden',
                 transform: 'translateZ(0)', // GPU acceleration
-                maxWidth: '100%',
                 display: 'block'
               }}
             />
@@ -191,9 +185,12 @@ export const Hero = () => {
         )}
       </div>
 
+      {/* Overlay Gradient - improves text readability */}
+      <div className="absolute inset-0 bg-black/20 pointer-events-none z-[1]" />
+
       {/* Content */}
-      <div className="relative z-10 h-full flex items-center justify-center w-full max-w-full">
-        <div className="w-full max-w-full px-4 sm:px-6 text-center">
+      <div className="relative z-10 h-full w-full flex items-center justify-center px-4 sm:px-6">
+        <div className="w-full max-w-4xl mx-auto text-center">
           <AnimatePresence mode="wait">
             <motion.div
               key={nextIndex !== null ? nextIndex : current}
@@ -201,26 +198,26 @@ export const Hero = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.8, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              className="max-w-4xl mx-auto w-full"
+              className="w-full"
             >
               <motion.h1
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-poppins font-medium text-primary-foreground mb-4 sm:mb-6 leading-tight break-words"
+                className="text-5xl sm:text-4xl md:text-5xl lg:text-6xl font-poppins font-medium text-primary-foreground mb-4 sm:mb-3 leading-tight"
                 style={{ textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}
               >
                 {slides[nextIndex !== null ? nextIndex : current].title}
               </motion.h1>
               <motion.p
-                className="text-base sm:text-lg md:text-xl text-primary-foreground/90 mb-6 sm:mb-10 max-w-2xl mx-auto font-poppins font-light break-words px-2"
+                className="text-base sm:text-lg md:text-xl text-primary-foreground/90 mb-8 sm:mb-8 max-w-2xl mx-auto font-poppins font-light px-2"
                 style={{ textShadow: '0 1px 10px rgba(0,0,0,0.3)' }}
               >
                 {slides[nextIndex !== null ? nextIndex : current].subtitle}
               </motion.p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full max-w-full">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full">
                 <Button
                   variant="hero"
                   size="lg"
                   onClick={() => handleNavClick('#services')}
-                  className="w-full sm:w-auto min-w-0"
+                  className="w-full sm:w-auto min-w-[200px]"
                 >
                   {slides[nextIndex !== null ? nextIndex : current].cta}
                 </Button>
@@ -228,7 +225,7 @@ export const Hero = () => {
                   variant="heroOutline"
                   size="lg"
                   onClick={() => handleNavClick('#contact')}
-                  className="w-full sm:w-auto min-w-0"
+                  className="w-full sm:w-auto min-w-[200px]"
                 >
                   Book Consultation
                 </Button>
@@ -239,32 +236,33 @@ export const Hero = () => {
       </div>
 
       {/* Navigation Arrows */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full bg-primary-foreground/10 backdrop-blur-sm hover:bg-primary-foreground/20 transition-all text-primary-foreground max-w-[calc(100vw-1rem)]"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-3 rounded-full bg-primary-foreground/10 backdrop-blur-sm hover:bg-primary-foreground/20 transition-all text-primary-foreground max-w-[calc(100vw-1rem)]"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
-      </button>
+      <div className="absolute inset-y-0 left-0 right-0 z-20 pointer-events-none flex items-center justify-between px-2 sm:px-4 md:px-8">
+        <button
+          onClick={prevSlide}
+          className="p-2 sm:p-3 rounded-full bg-primary-foreground/10 backdrop-blur-sm hover:bg-primary-foreground/20 transition-all text-primary-foreground pointer-events-auto"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="p-2 sm:p-3 rounded-full bg-primary-foreground/10 backdrop-blur-sm hover:bg-primary-foreground/20 transition-all text-primary-foreground pointer-events-auto"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+      </div>
 
       {/* Dots */}
-      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2 sm:gap-3 max-w-full overflow-hidden">
+      <div className="absolute bottom-6 sm:bottom-8 left-0 right-0 z-20 flex justify-center gap-2 sm:gap-3 px-4">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 flex-shrink-0 ${
-              index === current
-                ? 'bg-primary-foreground w-8'
-                : 'bg-primary-foreground/50 hover:bg-primary-foreground/70'
-            }`}
+            className={`h-2 rounded-full transition-all duration-300 ${index === current
+              ? 'bg-primary-foreground w-8'
+              : 'bg-primary-foreground/50 hover:bg-primary-foreground/70 w-2'
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
