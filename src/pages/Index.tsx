@@ -16,7 +16,7 @@ const Index = () => {
       <CTA />
       {/* <About /> */}
       <Testimonials />
-      <Contact />
+      {/* <Contact /> */}
       <Footer />
     </main>
   );
