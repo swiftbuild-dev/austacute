@@ -1,111 +1,30 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Sparkles, Heart, Smile, ArrowRight } from 'lucide-react';
-
-import serviceSkincare from '@/assets/service-skincare.jpg';
-import serviceFacial from '@/assets/service-facial.jpg';
-import serviceDental from '@/assets/service-dental.jpg';
+import { motion, useInView } from 'framer-motion';
+import { Sparkles, Flower2, Stethoscope } from 'lucide-react';
+import heroSkincare from '@/assets/austa-facial.jpg';
+import heroFacial from '@/assets/austa-skincare.jpg';
+import heroDental from '@/assets/austa-dental.jpg';
 
 const services = [
   {
-    icon: Sparkles,
     title: 'Advanced Skincare',
-    description:
-      'Experience transformative skincare with our cutting-edge treatments. Our expert aestheticians use the latest technology and premium products to address your unique skin concerns, from anti-aging solutions to targeted treatments for acne, hyperpigmentation, and more.',
-    secondaryText:
-      'Every treatment begins with a comprehensive skin analysis to ensure we create a personalized regimen that delivers visible, lasting results.',
-    image: serviceSkincare,
-    link: '#contact',
+    icon: Sparkles,
+    image: heroSkincare,
+    link: '#skincare'
   },
   {
-    icon: Heart,
-    title: 'Luxury Facials',
-    description:
-      'Indulge in our signature facial experiences designed to cleanse, nourish, and revitalize your skin. From hydrating treatments to deep-cleansing protocols, each session is tailored to your skin type and goals.',
-    secondaryText:
-      'Our facials combine traditional techniques with modern innovations, including LED therapy, microcurrent, and organic botanical extracts for a truly luxurious experience.',
-    image: serviceFacial,
-    link: '#contact',
+    title: 'Facial Treatments',
+    icon: Flower2,
+    image: heroFacial,
+    link: '#facials'
   },
   {
-    icon: Smile,
-    title: 'Dental Excellence',
-    description:
-      'Discover comprehensive dental care that prioritizes both health and aesthetics. Our state-of-the-art facility offers everything from routine cleanings to advanced cosmetic dentistry, all in a comfortable, welcoming environment.',
-    secondaryText:
-      'Whether you seek teeth whitening, veneers, or complete smile makeovers, our skilled dental professionals are dedicated to helping you achieve the confident smile you deserve.',
-    image: serviceDental,
-    link: '#contact',
-  },
+    title: 'Dental Care',
+    icon: Stethoscope,
+    image: heroDental,
+    link: '#dental'
+  }
 ];
-
-interface ServiceItemProps {
-  service: (typeof services)[0];
-  index: number;
-}
-
-const ServiceItem = ({ service, index }: ServiceItemProps) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const isEven = index % 2 === 0;
-  const Icon = service.icon;
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 60 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, delay: 0.2 }}
-      className={`flex flex-col ${
-        isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'
-      } gap-8 lg:gap-16 items-center`}
-    >
-      {/* Text Content */}
-      <div className="flex-1 space-y-6">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10">
-          <Icon className="w-7 h-7 text-primary" />
-        </div>
-        <h3 className="text-3xl md:text-4xl font-serif font-medium text-foreground">
-          {service.title}
-        </h3>
-        <p className="text-muted-foreground leading-relaxed text-lg">
-          {service.description}
-        </p>
-        <p className="text-muted-foreground leading-relaxed">
-          {service.secondaryText}
-        </p>
-        <a
-          href={service.link}
-          className="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all group"
-          onClick={(e) => {
-            e.preventDefault();
-            document.querySelector(service.link)?.scrollIntoView({ behavior: 'smooth' });
-          }}
-        >
-          Learn More
-          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-        </a>
-      </div>
-
-      {/* Image */}
-      <motion.div
-        className="flex-1 w-full"
-        whileHover={{ scale: 1.02 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="relative rounded-3xl overflow-hidden shadow-xl">
-          <img
-            src={service.image}
-            alt={service.title}
-            className="w-full h-[400px] object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent" />
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-};
 
 export const Services = () => {
   const headerRef = useRef(null);
@@ -128,16 +47,59 @@ export const Services = () => {
           <div className="w-20 h-1 bg-primary mx-auto mb-8 rounded-full" />
           <p className="text-lg text-muted-foreground leading-relaxed">
             At AustaCute, we offer a comprehensive range of premium treatments designed to enhance
-            your natural beauty and well-being. Each service is delivered by certified professionals
-            using the finest products and latest techniques.
+            your natural beauty and well-being. 
           </p>
         </motion.div>
 
-        {/* Services List */}
-        <div className="space-y-24 lg:space-y-32">
-          {services.map((service, index) => (
-            <ServiceItem key={service.title} service={service} index={index} />
-          ))}
+        {/* Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((service, index) => {
+            const Icon = service.icon;
+            return (
+              <motion.div
+                key={service.title}
+                initial={{ opacity: 0, y: 40 }}
+                animate={isHeaderInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="group relative h-[500px] md:h-[600px] overflow-hidden cursor-pointer"
+              >
+                {/* Background Image */}
+                <img
+                  src={service.image}
+                  alt={service.title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+                {/* Content */}
+                <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
+                  <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm mb-4">
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <p className="text-sm font-medium tracking-wider uppercase mb-2 opacity-90">
+                      {service.title.split(' ')[0]}
+                    </p>
+                    <h3 className="text-3xl md:text-4xl font-serif font-medium mb-4">
+                      {service.title}
+                    </h3>
+                    <a
+                      href={service.link}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.querySelector(service.link)?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="inline-block px-8 py-3 bg-white text-black font-medium uppercase text-sm tracking-wider hover:bg-white/90 transition-colors"
+                    >
+                      Discover
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
