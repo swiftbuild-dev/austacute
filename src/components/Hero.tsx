@@ -128,7 +128,8 @@ export const Hero = () => {
   return (
     <section
       id="home"
-      className="relative h-screen w-full max-w-full overflow-x-hidden bg-neutral-900"
+      className="relative w-full overflow-hidden bg-neutral-900"
+      style={{ height: '100dvh' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
