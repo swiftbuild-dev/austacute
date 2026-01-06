@@ -33,6 +33,7 @@ export const Hero = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState<Set<number>>(new Set());
   const [nextIndex, setNextIndex] = useState<number | null>(null);
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null);
   const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Preload all images on mount to prevent blank states
@@ -111,6 +112,14 @@ export const Hero = () => {
     if (index === current) return;
     transitionToSlide(index);
   }, [current, transitionToSlide]);
+
+  // Lock hero to *actual* viewport height to avoid mobile 100vh/dvh quirks
+  useEffect(() => {
+    const update = () => setViewportHeight(window.innerHeight);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   useEffect(() => {
     if (isPaused) return;
