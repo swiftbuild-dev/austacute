@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         serif: ["Cormorant Garamond", "Georgia", "serif"],
         sans: ["Inter", "system-ui", "sans-serif"],
+        poppins: ["Poppins", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
