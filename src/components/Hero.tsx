@@ -210,7 +210,7 @@ export const Hero = () => {
               className="w-full"
             >
               <motion.h1
-                className="text-5xl sm:text-4xl md:text-5xl lg:text-6xl font-poppins font-medium text-primary-foreground mb-4 sm:mb-3 leading-tight"
+                className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-poppins font-medium text-primary-foreground mb-4 sm:mb-3 leading-tight"
                 style={{ textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}
               >
                 {slides[nextIndex !== null ? nextIndex : current].title}
