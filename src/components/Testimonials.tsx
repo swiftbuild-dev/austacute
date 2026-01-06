@@ -103,7 +103,7 @@ export const Testimonials = () => {
   const isHeaderInView = useInView(headerRef, { once: true });
 
   return (
-    <section id="testimonials" className="py-24 lg:py-32 bg-background">
+    <section id="testimonials" className="py-16 lg:py-16 bg-background">
       <div className="container mx-auto px-6">
         {/* Header */}
         <motion.div
