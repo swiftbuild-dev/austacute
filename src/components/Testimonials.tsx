@@ -5,9 +5,9 @@ import { Star } from 'lucide-react';
 
 const testimonials = [
   {
-    name: 'Adebayo T.',
+    name: 'Ifunanya Nwoye',
     role: 'Facial Treatment Client',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
+    image: 'https://plus.unsplash.com/premium_photo-1666264200745-faffb4346e6f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     quote:
       'AustaCute transformed my skin completely! The facial treatments are exceptional and the staff is incredibly professional. I have never felt more confident.',
     rating: 5,
@@ -15,7 +15,7 @@ const testimonials = [
   {
     name: 'Chioma Obi',
     role: 'Dental Care Patient',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1645620623022-b5b2c1ec5d1c?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     quote:
       'Finally found a dental clinic where I feel comfortable. The team is gentle, thorough, and my smile has never looked better. Highly recommend!',
     rating: 5,
@@ -23,23 +23,23 @@ const testimonials = [
   {
     name: 'Fatima Musa',
     role: 'Skincare Client',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1632765854612-9b02b6ec2b15?q=80&w=686&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     quote:
       'The personalized skincare regimen they created for me has worked wonders. My acne is finally under control and my skin glows. Thank you, AustaCute!',
     rating: 5,
   },
   {
-    name: 'Olamide Adeyemi',
+    name: 'Oghenekevwe Efe',
     role: 'Luxury Facial Client',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1618298363483-e31a31f1a1e2?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     quote:
       'The signature facial experience was pure bliss. From the moment I walked in, I felt pampered and cared for. Already booked my next appointment!',
     rating: 5,
   },
   {
-    name: 'Emeka Okafor',
+    name: 'Chiamaka Okorie',
     role: 'Cosmetic Dentistry Patient',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1624574966266-1cdd65b74500?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     quote:
       'Got veneers done here and the results exceeded my expectations. Professional, painless, and the outcome is stunning. Worth every penny.',
     rating: 5,
@@ -47,7 +47,7 @@ const testimonials = [
   {
     name: 'Grace Eze',
     role: 'Skincare & Facial Client',
-    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1629747387925-6905ff5a558a?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     quote:
       'I have been coming to AustaCute for over a year now and the consistency in quality is remarkable. My skin has never looked or felt this good!',
     rating: 5,
