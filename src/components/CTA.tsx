@@ -2,28 +2,13 @@ import React, { useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Phone, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { BookingModal } from './BookingModal';
 import ctaImage from '@/assets/austa-cream.jpg';
 
 export const CTA = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const [phone, setPhone] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (phone) {
-      setIsModalOpen(true);
-      setPhone('');
-    }
-  };
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   return (
     <section className="py-8 lg:py-16 bg-background">
@@ -62,61 +47,32 @@ export const CTA = () => {
                 className="text-lg text-muted-foreground mb-8 leading-relaxed"
               >
                 Book a personalized consultation with our experts and discover the perfect
-                treatments tailored to your unique needs. Share your phone number and we'll reach
-                out to schedule your appointment.
+                treatments tailored to your unique needs. Click below to schedule your appointment.
               </motion.p>
-              <motion.form
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.4, duration: 0.6 }}
-                onSubmit={handleSubmit}
-                className="space-y-4"
+                className="space-y-6"
               >
-                <div className="relative">
-                  <input
-                    type="tel"
-                    placeholder="Your phone number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-6 pr-40 py-5 border-2 border-border rounded-lg focus:border-primary focus:outline-none transition-colors text-foreground placeholder:text-muted-foreground bg-background text-lg"
-                    required
-                  />
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 px-6 whitespace-nowrap"
-                  >
-                    Get Started
-                  </Button>
-                </div>
+                <Button
+                  size="lg"
+                  className="px-8 py-6 text-lg bg-primary hover:bg-primary-dark text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  onClick={() => setIsBookingModalOpen(true)}
+                >
+                  Book Free Consultation
+                </Button>
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
                   <Phone className="w-4 h-4" />
                   or call us directly at +234 816 666 3089
                 </p>
-              </motion.form>
+              </motion.div>
             </div>
           </div>
         </motion.div>
       </div>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="items-center text-center space-y-4 pt-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-              <CheckCircle2 className="w-8 h-8 text-primary" />
-            </div>
-            <DialogTitle className="text-2xl font-serif">Thank You!</DialogTitle>
-            <DialogDescription className="text-lg text-center pb-4">
-              We've received your phone number. One of our beauty experts will contact you shortly to schedule your consultation.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center pb-4">
-            <Button onClick={() => setIsModalOpen(false)} className="px-8 min-w-[150px]">
-              Close
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
     </section>
   );
 };

@@ -5,7 +5,7 @@ import { Star } from 'lucide-react';
 
 const testimonials = [
   {
-    name: 'Sarah Johnson',
+    name: 'Adebayo T.',
     role: 'Facial Treatment Client',
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
     quote:
@@ -13,7 +13,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    name: 'Michael Chen',
+    name: 'Chioma Obi',
     role: 'Dental Care Patient',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
     quote:
@@ -21,7 +21,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    name: 'Emily Davis',
+    name: 'Fatima Musa',
     role: 'Skincare Client',
     image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&auto=format&fit=crop&q=80',
     quote:
@@ -29,7 +29,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    name: 'Jessica Martinez',
+    name: 'Olamide Adeyemi',
     role: 'Luxury Facial Client',
     image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
     quote:
@@ -37,7 +37,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    name: 'David Thompson',
+    name: 'Emeka Okafor',
     role: 'Cosmetic Dentistry Patient',
     image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
     quote:
@@ -45,7 +45,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    name: 'Amanda Wilson',
+    name: 'Grace Eze',
     role: 'Skincare & Facial Client',
     image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80',
     quote:

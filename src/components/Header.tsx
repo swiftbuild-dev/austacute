@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { BookingModal } from './BookingModal';
 
 const navLinks = [
   { name: 'Home', href: '#home' },
@@ -14,6 +15,7 @@ const navLinks = [
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,11 +36,10 @@ export const Header = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
             ? 'bg-background/95 backdrop-blur-md shadow-md py-3'
             : 'bg-transparent py-5'
-        }`}
+          }`}
       >
         <div className="container mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
@@ -55,9 +56,8 @@ export const Header = () => {
           >
             <Leaf className={`w-8 h-8 ${isScrolled ? 'text-primary' : 'text-primary-foreground'}`} />
             <span
-              className={`text-2xl font-serif font-semibold tracking-tight ${
-                isScrolled ? 'text-foreground' : 'text-primary-foreground'
-              }`}
+              className={`text-2xl font-serif font-semibold tracking-tight ${isScrolled ? 'text-foreground' : 'text-primary-foreground'
+                }`}
             >
               Austa<span className="text-primary">Cute</span>
             </span>
@@ -69,9 +69,8 @@ export const Header = () => {
               <motion.a
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isScrolled ? 'text-foreground' : 'text-primary-foreground'
-                }`}
+                className={`text-sm font-medium transition-colors hover:text-primary ${isScrolled ? 'text-foreground' : 'text-primary-foreground'
+                  }`}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -88,21 +87,20 @@ export const Header = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              <Button variant="nav" size="default" onClick={() => handleNavClick('#contact')}>
-                Book Appointment
+              <Button variant="nav" size="default" onClick={() => setIsBookingModalOpen(true)}>
+                Book Free Consultation
               </Button>
             </motion.div>
           </nav>
 
           {/* Mobile Menu Button */}
           <button
-            className={`lg:hidden p-2 rounded-lg ${
-              isScrolled ? 'text-foreground' : 'text-primary-foreground'
-            }`}
+            className={`lg:hidden p-2 rounded-lg ${isScrolled ? 'text-foreground' : 'text-primary-foreground'
+              }`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? <X className="w-8 h-8 text-primary" /> : <Menu className="w-8 h-8 text-primary" />}
           </button>
         </div>
       </header>
@@ -147,14 +145,18 @@ export const Header = () => {
                 variant="default"
                 size="lg"
                 className="mt-8"
-                onClick={() => handleNavClick('#contact')}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsBookingModalOpen(true);
+                }}
               >
-                Book Appointment
+                Book Free Consultation
               </Button>
             </motion.nav>
           </motion.div>
         )}
       </AnimatePresence>
+      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
     </>
   );
 };
