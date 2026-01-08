@@ -1,4 +1,21 @@
-import { Leaf, Instagram, Facebook, Linkedin, Twitter } from 'lucide-react';
+import { Leaf, Facebook } from 'lucide-react';
+
+const TikTok = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
 
 const quickLinks = [
   { name: 'Home', href: '#home' },
@@ -16,10 +33,9 @@ const services = [
 ];
 
 const socialLinks = [
-  { name: 'Instagram', icon: Instagram, href: '#' },
-  { name: 'Facebook', icon: Facebook, href: '#' },
-  { name: 'LinkedIn', icon: Linkedin, href: '#' },
-  { name: 'Twitter', icon: Twitter, href: '#' },
+  { name: 'TikTok', icon: TikTok, href: 'https://www.tiktok.com/@aceskincare_?_r=1&_t=ZS-92sSHcYsmt6' },
+  { name: 'Facebook', icon: Facebook, href: 'https://www.facebook.com/share/1D8tGpVCnC/?mibextid=LQQJ4d' },
+
 ];
 
 export const Footer = () => {
@@ -102,10 +118,9 @@ export const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-6">Contact Info</h3>
             <ul className="space-y-3 text-sm text-primary-foreground/80">
-              <li>123 Beauty Boulevard</li>
-              <li>Suite 456, Los Angeles, CA 90210</li>
-              <li className="pt-2">(555) 123-4567</li>
-              <li>hello@austacute.com</li>
+              <li>No 24 faith plaza DLA</li>
+              <li className="pt-2">+234 906 898 2782</li>
+              <li>ausutacuteempire@gmail.com</li>
               <li className="pt-2">Mon - Fri: 9AM - 8PM</li>
               <li>Sat - Sun: 10AM - 6PM</li>
             </ul>
