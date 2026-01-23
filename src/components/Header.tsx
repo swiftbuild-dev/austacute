@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Leaf } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BookingModal } from './BookingModal';
 
-const navLinks = [
+interface NavLink {
+  name: string;
+  href: string;
+  isRoute?: boolean;
+}
+
+const navLinks: NavLink[] = [
   { name: 'Home', href: '#home' },
+  { name: 'Shop', href: '/shop', isRoute: true },
   { name: 'Services', href: '#services' },
   { name: 'About', href: '#about' },
   { name: 'Testimonials', href: '#testimonials' },
@@ -16,6 +24,8 @@ export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,11 +35,36 @@ export const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (link: NavLink) => {
     setIsMobileMenuOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+
+    if (link.isRoute) {
+      navigate(link.href);
+    } else {
+      // If we're not on the home page, navigate there first
+      if (location.pathname !== '/') {
+        navigate('/');
+        // Wait for navigation then scroll
+        setTimeout(() => {
+          const element = document.querySelector(link.href);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      } else {
+        const element = document.querySelector(link.href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  };
+
+  const handleLogoClick = () => {
+    if (location.pathname !== '/') {
+      navigate('/');
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -37,22 +72,18 @@ export const Header = () => {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-            ? 'bg-background/95 backdrop-blur-md shadow-md py-3'
-            : 'bg-transparent py-5'
+          ? 'bg-background/95 backdrop-blur-md shadow-md py-3'
+          : 'bg-transparent py-5'
           }`}
       >
         <div className="container mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <motion.a
-            href="#home"
+          <motion.button
+            onClick={handleLogoClick}
             className="flex items-center gap-2"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            onClick={(e) => {
-              e.preventDefault();
-              handleNavClick('#home');
-            }}
           >
             <Leaf className={`w-8 h-8 ${isScrolled ? 'text-primary' : 'text-primary-foreground'}`} />
             <span
@@ -61,26 +92,22 @@ export const Header = () => {
             >
               Austa<span className="text-primary">Cute</span>
             </span>
-          </motion.a>
+          </motion.button>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
             {navLinks.map((link, index) => (
-              <motion.a
+              <motion.button
                 key={link.name}
-                href={link.href}
+                onClick={() => handleNavClick(link)}
                 className={`text-sm font-medium transition-colors hover:text-primary ${isScrolled ? 'text-foreground' : 'text-primary-foreground'
                   }`}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(link.href);
-                }}
               >
                 {link.name}
-              </motion.a>
+              </motion.button>
             ))}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -126,20 +153,16 @@ export const Header = () => {
               exit={{ x: '100%' }}
             >
               {navLinks.map((link, index) => (
-                <motion.a
+                <motion.button
                   key={link.name}
-                  href={link.href}
-                  className="text-lg font-medium py-4 border-b border-border text-foreground hover:text-primary transition-colors"
+                  onClick={() => handleNavClick(link)}
+                  className="text-lg font-medium py-4 border-b border-border text-foreground hover:text-primary transition-colors text-left"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(link.href);
-                  }}
                 >
                   {link.name}
-                </motion.a>
+                </motion.button>
               ))}
               <Button
                 variant="default"
@@ -160,3 +183,4 @@ export const Header = () => {
     </>
   );
 };
+
