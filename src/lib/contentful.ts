@@ -65,8 +65,9 @@ export type ProductSkeleton = EntrySkeletonType<
  * otherwise using the standard access token for published content
  */
 const initializeContentfulClient = (): ContentfulClientApi<undefined> => {
-    const spaceId = import.meta.env.VITE_CONTENTFUL_SPACE_ID;
-    const accessToken = import.meta.env.VITE_CONTENTFUL_ACCESS_TOKEN;
+    // Publishable Content Delivery API keys (safe to include in frontend)
+    const spaceId = import.meta.env.VITE_CONTENTFUL_SPACE_ID || 'z9ei2s7jmq34';
+    const accessToken = import.meta.env.VITE_CONTENTFUL_ACCESS_TOKEN || '1D1JdXttqP3jIt6Xasfcs_IIFyHBOtpvfmuUliWmkgc';
     const previewToken = import.meta.env.VITE_CONTENTFUL_PREVIEW_TOKEN;
 
     if (!spaceId || !accessToken) {

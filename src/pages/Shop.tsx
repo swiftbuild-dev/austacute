@@ -1,18 +1,23 @@
 import { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Sparkles, Shield, Truck, RotateCcw, MessageCircle } from 'lucide-react';
+import { Sparkles, Shield, Truck, RotateCcw, MessageCircle, Loader2 } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { ProductModal } from '@/components/shop/ProductModal';
-import { products, WHATSAPP_NUMBER } from '@/data/mockProducts';
+import { useAllProducts } from '@/hooks/useContentful';
+import { WHATSAPP_NUMBER } from '@/data/mockProducts';
 import { Product } from '@/types/shop';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Shop = () => {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const headerRef = useRef(null);
     const isHeaderInView = useInView(headerRef, { once: true });
+
+    // Fetch products from Contentful
+    const { data: products, isLoading, error } = useAllProducts();
 
     const handleProductClick = (product: Product) => {
         setSelectedProduct(product);
@@ -108,22 +113,56 @@ const Shop = () => {
                                 All Products
                             </h2>
                             <p className="text-muted-foreground">
-                                {products.length} premium skincare products
+                                {isLoading ? 'Loading...' : `${products?.length || 0} premium skincare products`}
                             </p>
                         </div>
                     </motion.div>
 
+                    {/* Error State */}
+                    {error && (
+                        <div className="text-center py-12">
+                            <p className="text-destructive mb-4">Failed to load products</p>
+                            <p className="text-muted-foreground text-sm">{error.message}</p>
+                        </div>
+                    )}
+
+                    {/* Loading State */}
+                    {isLoading && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <div key={i} className="rounded-2xl border border-border/50 overflow-hidden">
+                                    <Skeleton className="aspect-square w-full" />
+                                    <div className="p-4 space-y-3">
+                                        <Skeleton className="h-4 w-20" />
+                                        <Skeleton className="h-6 w-3/4" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-8 w-24" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Products Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                        {products.map((product, index) => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                onClick={() => handleProductClick(product)}
-                                index={index}
-                            />
-                        ))}
-                    </div>
+                    {!isLoading && !error && products && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                            {products.map((product, index) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onClick={() => handleProductClick(product)}
+                                    index={index}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Empty State */}
+                    {!isLoading && !error && products?.length === 0 && (
+                        <div className="text-center py-12">
+                            <p className="text-muted-foreground">No products found</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
