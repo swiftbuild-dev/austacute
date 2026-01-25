@@ -101,8 +101,8 @@ export const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) =>
                                         key={index}
                                         onClick={() => setActiveImageIndex(index)}
                                         className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${activeImageIndex === index
-                                                ? 'border-primary ring-2 ring-primary/20'
-                                                : 'border-transparent hover:border-primary/50'
+                                            ? 'border-primary ring-2 ring-primary/20'
+                                            : 'border-transparent hover:border-primary/50'
                                             }`}
                                     >
                                         <img
