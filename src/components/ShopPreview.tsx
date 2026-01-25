@@ -2,17 +2,27 @@ import { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { products } from '@/data/mockProducts';
+import { useFeaturedProducts } from '@/hooks/useContentful';
+import { products as mockProducts } from '@/data/mockProducts';
 import { Product } from '@/types/shop';
 import { ProductCard } from './shop/ProductCard';
 import { ProductModal } from './shop/ProductModal';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const ShopPreview = () => {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const headerRef = useRef(null);
     const isHeaderInView = useInView(headerRef, { once: true });
+
+    // Fetch featured products from Contentful
+    const { data: featuredProducts, isLoading, error } = useFeaturedProducts();
+
+    // Fallback to mock data if Contentful fails or returns empty
+    const displayProducts = featuredProducts && featuredProducts.length > 0 
+        ? featuredProducts.slice(0, 3)
+        : mockProducts.filter((p) => p.featured).slice(0, 3);
 
     const handleProductClick = (product: Product) => {
         setSelectedProduct(product);
@@ -22,9 +32,6 @@ export const ShopPreview = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
     };
-
-    // Get featured products (or first 3)
-    const featuredProducts = products.filter((p) => p.featured).slice(0, 3);
 
     return (
         <>
@@ -75,17 +82,36 @@ export const ShopPreview = () => {
                         </div>
                     </motion.div>
 
+                    {/* Loading State */}
+                    {isLoading && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="rounded-2xl border border-border/50 overflow-hidden">
+                                    <Skeleton className="aspect-square w-full" />
+                                    <div className="p-4 space-y-3">
+                                        <Skeleton className="h-4 w-20" />
+                                        <Skeleton className="h-6 w-3/4" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-8 w-24" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Products Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
-                        {featuredProducts.map((product, index) => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                onClick={() => handleProductClick(product)}
-                                index={index}
-                            />
-                        ))}
-                    </div>
+                    {!isLoading && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
+                            {displayProducts.map((product, index) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onClick={() => handleProductClick(product)}
+                                    index={index}
+                                />
+                            ))}
+                        </div>
+                    )}
 
                     {/* View All CTA */}
                     <motion.div
