@@ -2,7 +2,7 @@
  * Contentful CMS Client Configuration
  *
  * This file sets up the Contentful client with proper TypeScript types
- * and exports all necessary functions for fetching and transforming content.
+ * for Contentful SDK v10+ (EntrySkeletonType pattern).
  *
  * Environment variables required in .env.local:
  * - VITE_CONTENTFUL_SPACE_ID
@@ -10,15 +10,61 @@
  * - VITE_CONTENTFUL_PREVIEW_TOKEN (optional, for preview mode)
  */
 
-import { createClient } from 'contentful';
-import type { ContentfulClientApi, Asset, Entry } from 'contentful';
+import { createClient, EntryFieldTypes } from 'contentful';
+import type { ContentfulClientApi, Asset, EntrySkeletonType } from 'contentful';
+
+/**
+ * TYPE DEFINITIONS FOR CONTENTFUL RESPONSES
+ * Using EntrySkeletonType pattern required by Contentful SDK v10+
+ */
+
+// Category skeleton with contentTypeId
+export type CategorySkeleton = EntrySkeletonType<
+    {
+        name: EntryFieldTypes.Text;
+        slug: EntryFieldTypes.Text;
+        description?: EntryFieldTypes.Text;
+    },
+    'category'
+>;
+
+// Product variant skeleton with contentTypeId
+export type ProductVariantSkeleton = EntrySkeletonType<
+    {
+        name: EntryFieldTypes.Text;
+        priceModifier: EntryFieldTypes.Integer;
+    },
+    'productVariant'
+>;
+
+// Product skeleton with contentTypeId
+export type ProductSkeleton = EntrySkeletonType<
+    {
+        internalName: EntryFieldTypes.Text;
+        name: EntryFieldTypes.Text;
+        slug: EntryFieldTypes.Text;
+        sku: EntryFieldTypes.Text;
+        category: EntryFieldTypes.EntryLink<CategorySkeleton>;
+        images: EntryFieldTypes.Array<EntryFieldTypes.AssetLink>;
+        shortDescription: EntryFieldTypes.Text;
+        description: EntryFieldTypes.Text;
+        price: EntryFieldTypes.Integer;
+        compareAtPrice?: EntryFieldTypes.Integer;
+        inStock: EntryFieldTypes.Boolean;
+        stockQuantity?: EntryFieldTypes.Integer;
+        variants?: EntryFieldTypes.Array<EntryFieldTypes.EntryLink<ProductVariantSkeleton>>;
+        trustBadges?: EntryFieldTypes.Array<EntryFieldTypes.Symbol>;
+        featured?: EntryFieldTypes.Boolean;
+    },
+    'product'
+>;
 
 /**
  * Initialize the Contentful client
  * Using preview token if available for draft/unpublished content,
  * otherwise using the standard access token for published content
  */
-const initializeContentfulClient = (): ContentfulClientApi => {
+const initializeContentfulClient = (): ContentfulClientApi<undefined> => {
     const spaceId = import.meta.env.VITE_CONTENTFUL_SPACE_ID;
     const accessToken = import.meta.env.VITE_CONTENTFUL_ACCESS_TOKEN;
     const previewToken = import.meta.env.VITE_CONTENTFUL_PREVIEW_TOKEN;
@@ -37,63 +83,14 @@ const initializeContentfulClient = (): ContentfulClientApi => {
 };
 
 // Create a singleton client instance
-let contentfulClient: ContentfulClientApi | null = null;
+let contentfulClient: ContentfulClientApi<undefined> | null = null;
 
-export const getContentfulClient = (): ContentfulClientApi => {
+export const getContentfulClient = (): ContentfulClientApi<undefined> => {
     if (!contentfulClient) {
         contentfulClient = initializeContentfulClient();
     }
     return contentfulClient;
 };
-
-/**
- * TYPE DEFINITIONS FOR CONTENTFUL RESPONSES
- * These match the content model structure defined in Contentful
- */
-
-export interface ContentfulCategory {
-    sys: {
-        id: string;
-    };
-    fields: {
-        name: string;
-        slug: string;
-        description?: string;
-    };
-}
-
-export interface ContentfulProductVariant {
-    sys: {
-        id: string;
-    };
-    fields: {
-        name: string;
-        priceModifier: number;
-    };
-}
-
-export interface ContentfulProduct {
-    sys: {
-        id: string;
-    };
-    fields: {
-        internalName: string;
-        name: string;
-        slug: string;
-        sku: string;
-        category: Entry<ContentfulCategory>;
-        images: Asset[];
-        shortDescription: string;
-        description: string;
-        price: number;
-        compareAtPrice?: number;
-        inStock: boolean;
-        stockQuantity?: number;
-        variants?: Entry<ContentfulProductVariant>[];
-        trustBadges?: string[];
-        featured?: boolean;
-    };
-}
 
 /**
  * ERROR HANDLING
@@ -145,18 +142,22 @@ export const getOptimizedImageUrl = (
 /**
  * Extract image URLs from Contentful assets
  * Returns optimized URLs for both display and thumbnail
+ * Updated for SDK v10+ Asset type
  */
-export const extractImageUrls = (assets: Asset[]): string[] => {
+export const extractImageUrls = (assets: Asset<undefined, string>[]): string[] => {
     if (!assets || assets.length === 0) {
         return [];
     }
 
-    return assets.map((asset) => {
-        if (!asset.fields.file?.url) {
-            return '';
-        }
-        return getOptimizedImageUrl(asset.fields.file.url);
-    });
+    return assets
+        .map((asset) => {
+            const file = asset.fields.file;
+            if (!file || typeof file.url !== 'string') {
+                return '';
+            }
+            return getOptimizedImageUrl(file.url);
+        })
+        .filter((url): url is string => url !== '');
 };
 
 /**

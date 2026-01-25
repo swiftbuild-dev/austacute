@@ -293,6 +293,15 @@ export const useProductLoadingState = (...queries: UseQueryResult<unknown, unkno
  * const errors = useProductErrorState(productsQuery, categoriesQuery);
  */
 export const useProductErrorState = (...queries: UseQueryResult<unknown, unknown>[]): Error | null => {
-    const error = queries.find((query) => query.error)?.error;
-    return error || null;
+    const errorQuery = queries.find((query) => query.error);
+    const error = errorQuery?.error;
+    
+    // Properly type check the error
+    if (error instanceof Error) {
+        return error;
+    }
+    if (error) {
+        return new Error(String(error));
+    }
+    return null;
 };

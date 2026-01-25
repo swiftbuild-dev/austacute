@@ -4,15 +4,10 @@
  * This file contains all functions for fetching and transforming
  * Contentful content into the application's data structures.
  *
- * Key responsibilities:
- * - Fetch products, categories, and variants from Contentful
- * - Transform Contentful responses to match application types
- * - Handle relationships and references
- * - Provide filtering and search capabilities
- * - Implement error handling and caching
+ * Updated for Contentful SDK v10+ with EntrySkeletonType pattern.
  */
 
-import type { Entry } from 'contentful';
+import type { Entry, Asset } from 'contentful';
 import {
     getContentfulClient,
     ContentfulError,
@@ -22,18 +17,15 @@ import {
     setCachedData,
     withRetry,
 } from '@/lib/contentful';
-import type { ContentfulCategory, ContentfulProduct, ContentfulProductVariant } from '@/lib/contentful';
+import type {
+    CategorySkeleton,
+    ProductSkeleton,
+    ProductVariantSkeleton,
+} from '@/lib/contentful';
 import type { Product, ProductVariant, Category } from '@/types/shop';
 
 /**
  * FETCH ALL PRODUCTS
- *
- * Fetches all published products from Contentful with their:
- * - Category references (resolved)
- * - Product variant references (resolved)
- * - Optimized image URLs
- *
- * Implements caching to reduce API calls
  */
 export const fetchAllProducts = async (): Promise<Product[]> => {
     const cacheKey = 'all-products';
@@ -47,19 +39,17 @@ export const fetchAllProducts = async (): Promise<Product[]> => {
     try {
         const products = await withRetry(async () => {
             const client = getContentfulClient();
-            const response = await client.getEntries<ContentfulProduct>({
+            const response = await client.getEntries<ProductSkeleton>({
                 content_type: 'product',
                 limit: 100,
-                include: 2, // Include up to 2 levels of references (category, variants)
-                order: '-sys.createdAt', // Most recently created first
+                include: 2,
+                order: ['-sys.createdAt'],
             });
 
             return response.items.map((item) => transformProductEntry(item));
         });
 
-        // Cache the results
         setCachedData(cacheKey, products);
-
         return products;
     } catch (error) {
         handleContentfulError(error, 'fetching all products');
@@ -68,9 +58,6 @@ export const fetchAllProducts = async (): Promise<Product[]> => {
 
 /**
  * FETCH FEATURED PRODUCTS
- *
- * Fetches only products marked as featured in Contentful
- * Useful for home page hero section and featured section
  */
 export const fetchFeaturedProducts = async (): Promise<Product[]> => {
     const cacheKey = 'featured-products';
@@ -84,7 +71,7 @@ export const fetchFeaturedProducts = async (): Promise<Product[]> => {
     try {
         const products = await withRetry(async () => {
             const client = getContentfulClient();
-            const response = await client.getEntries<ContentfulProduct>({
+            const response = await client.getEntries<ProductSkeleton>({
                 content_type: 'product',
                 'fields.featured': true,
                 limit: 10,
@@ -95,7 +82,6 @@ export const fetchFeaturedProducts = async (): Promise<Product[]> => {
         });
 
         setCachedData(cacheKey, products);
-
         return products;
     } catch (error) {
         handleContentfulError(error, 'fetching featured products');
@@ -104,9 +90,6 @@ export const fetchFeaturedProducts = async (): Promise<Product[]> => {
 
 /**
  * FETCH PRODUCT BY SLUG
- *
- * Fetches a single product by its slug (URL-friendly identifier)
- * Used for individual product pages/modals
  */
 export const fetchProductBySlug = async (slug: string): Promise<Product | null> => {
     if (!slug) {
@@ -124,7 +107,7 @@ export const fetchProductBySlug = async (slug: string): Promise<Product | null> 
     try {
         const product = await withRetry(async () => {
             const client = getContentfulClient();
-            const response = await client.getEntries<ContentfulProduct>({
+            const response = await client.getEntries<ProductSkeleton>({
                 content_type: 'product',
                 'fields.slug': slug,
                 limit: 1,
@@ -139,7 +122,6 @@ export const fetchProductBySlug = async (slug: string): Promise<Product | null> 
         });
 
         setCachedData(cacheKey, product);
-
         return product;
     } catch (error) {
         handleContentfulError(error, `fetching product by slug: ${slug}`);
@@ -148,8 +130,6 @@ export const fetchProductBySlug = async (slug: string): Promise<Product | null> 
 
 /**
  * FETCH PRODUCT BY ID
- *
- * Fetches a single product by its Contentful system ID
  */
 export const fetchProductById = async (id: string): Promise<Product | null> => {
     if (!id) {
@@ -167,7 +147,7 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
     try {
         const product = await withRetry(async () => {
             const client = getContentfulClient();
-            const entry = await client.getEntry<ContentfulProduct>(id);
+            const entry = await client.getEntry<ProductSkeleton>(id, { include: 2 });
 
             if (!entry) {
                 return null;
@@ -177,10 +157,8 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
         });
 
         setCachedData(cacheKey, product);
-
         return product;
     } catch (error) {
-        // 404 errors are expected when product doesn't exist
         if (error instanceof Error && error.message.includes('404')) {
             console.log(`Product not found: ${id}`);
             return null;
@@ -191,9 +169,6 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
 
 /**
  * FETCH PRODUCTS BY CATEGORY
- *
- * Fetches all products that belong to a specific category
- * Category can be identified by slug or ID
  */
 export const fetchProductsByCategory = async (categorySlug: string): Promise<Product[]> => {
     if (!categorySlug) {
@@ -212,8 +187,7 @@ export const fetchProductsByCategory = async (categorySlug: string): Promise<Pro
         const products = await withRetry(async () => {
             const client = getContentfulClient();
 
-            // First, find the category by slug
-            const categoryResponse = await client.getEntries<ContentfulCategory>({
+            const categoryResponse = await client.getEntries<CategorySkeleton>({
                 content_type: 'category',
                 'fields.slug': categorySlug,
                 limit: 1,
@@ -226,8 +200,7 @@ export const fetchProductsByCategory = async (categorySlug: string): Promise<Pro
 
             const categoryId = categoryResponse.items[0].sys.id;
 
-            // Then fetch products in that category
-            const response = await client.getEntries<ContentfulProduct>({
+            const response = await client.getEntries<ProductSkeleton>({
                 content_type: 'product',
                 'fields.category.sys.id': categoryId,
                 limit: 100,
@@ -238,7 +211,6 @@ export const fetchProductsByCategory = async (categorySlug: string): Promise<Pro
         });
 
         setCachedData(cacheKey, products);
-
         return products;
     } catch (error) {
         handleContentfulError(error, `fetching products by category: ${categorySlug}`);
@@ -247,8 +219,6 @@ export const fetchProductsByCategory = async (categorySlug: string): Promise<Pro
 
 /**
  * FETCH ALL CATEGORIES
- *
- * Fetches all available product categories
  */
 export const fetchAllCategories = async (): Promise<Category[]> => {
     const cacheKey = 'all-categories';
@@ -262,21 +232,19 @@ export const fetchAllCategories = async (): Promise<Category[]> => {
     try {
         const categories = await withRetry(async () => {
             const client = getContentfulClient();
-            const response = await client.getEntries<ContentfulCategory>({
+            const response = await client.getEntries<CategorySkeleton>({
                 content_type: 'category',
                 limit: 50,
-                order: 'fields.name',
             });
 
             return response.items.map((item) => ({
-                name: item.fields.name,
-                slug: item.fields.slug,
-                description: item.fields.description,
+                name: item.fields.name as string,
+                slug: item.fields.slug as string,
+                description: item.fields.description as string | undefined,
             }));
         });
 
         setCachedData(cacheKey, categories);
-
         return categories;
     } catch (error) {
         handleContentfulError(error, 'fetching all categories');
@@ -285,9 +253,6 @@ export const fetchAllCategories = async (): Promise<Category[]> => {
 
 /**
  * SEARCH PRODUCTS
- *
- * Full-text search across product names and descriptions
- * Uses Contentful's search capability
  */
 export const searchProducts = async (query: string): Promise<Product[]> => {
     if (!query || query.trim().length < 2) {
@@ -297,7 +262,7 @@ export const searchProducts = async (query: string): Promise<Product[]> => {
     try {
         const products = await withRetry(async () => {
             const client = getContentfulClient();
-            const response = await client.getEntries<ContentfulProduct>({
+            const response = await client.getEntries<ProductSkeleton>({
                 content_type: 'product',
                 query: query.trim(),
                 limit: 50,
@@ -315,19 +280,15 @@ export const searchProducts = async (query: string): Promise<Product[]> => {
 
 /**
  * TRANSFORMATION FUNCTIONS
- *
- * These functions convert Contentful responses to application types
+ * Transform Contentful entries to application types
  */
-
-/**
- * Transform a single product entry from Contentful
- * Handles all field mappings and relationship transformations
- */
-export const transformProductEntry = (entry: Entry<ContentfulProduct>): Product => {
+export const transformProductEntry = (
+    entry: Entry<ProductSkeleton, undefined, string>
+): Product => {
     const fields = entry.fields;
 
     // Validate required fields
-    if (!fields.name || !fields.slug || !fields.sku || !fields.price) {
+    if (!fields.name || !fields.slug || !fields.sku || fields.price === undefined) {
         throw new ContentfulError(
             `Invalid product entry ${entry.sys.id}: missing required fields`
         );
@@ -335,50 +296,60 @@ export const transformProductEntry = (entry: Entry<ContentfulProduct>): Product 
 
     // Transform category reference to string
     let categoryName = 'uncategorized';
-    if (fields.category) {
-        const categoryEntry = fields.category as Entry<ContentfulCategory>;
-        categoryName = categoryEntry.fields.name;
+    if (fields.category && 'fields' in fields.category) {
+        const categoryEntry = fields.category as Entry<CategorySkeleton, undefined, string>;
+        categoryName = categoryEntry.fields.name as string;
     }
 
     // Transform variant references
     let variants: ProductVariant[] = [];
     if (fields.variants && Array.isArray(fields.variants)) {
-        variants = (fields.variants as Entry<ContentfulProductVariant>[]).map((variantEntry) => ({
-            name: variantEntry.fields.name,
-            priceModifier: variantEntry.fields.priceModifier,
-        }));
+        variants = fields.variants
+            .filter(
+                (v): v is Entry<ProductVariantSkeleton, undefined, string> =>
+                    v !== null && typeof v === 'object' && 'fields' in v
+            )
+            .map((variantEntry) => ({
+                name: variantEntry.fields.name as string,
+                priceModifier: variantEntry.fields.priceModifier as number,
+            }));
     }
 
     // Extract and optimize image URLs
-    const images = extractImageUrls(fields.images || []);
+    let images: string[] = [];
+    if (fields.images && Array.isArray(fields.images)) {
+        const resolvedImages = fields.images.filter(
+            (img): img is Asset<undefined, string> =>
+                img !== null && typeof img === 'object' && 'fields' in img
+        );
+        images = extractImageUrls(resolvedImages);
+    }
 
     // Ensure at least one image
     if (images.length === 0) {
-        console.warn(
-            `Product ${entry.sys.id} has no images, using placeholder`
-        );
+        console.warn(`Product ${entry.sys.id} has no images, using placeholder`);
         images.push('/placeholder-product.jpg');
     }
 
     // Transform to application Product type
     const product: Product = {
         id: entry.sys.id,
-        name: fields.name,
-        slug: fields.slug,
-        sku: fields.sku,
-        price: Math.round(fields.price), // Ensure integer
+        name: fields.name as string,
+        slug: fields.slug as string,
+        sku: fields.sku as string,
+        price: Math.round(fields.price as number),
         compareAtPrice: fields.compareAtPrice
-            ? Math.round(fields.compareAtPrice)
+            ? Math.round(fields.compareAtPrice as number)
             : undefined,
-        shortDescription: fields.shortDescription,
-        description: fields.description,
+        shortDescription: fields.shortDescription as string,
+        description: fields.description as string,
         images,
         category: categoryName,
         variants: variants.length > 0 ? variants : undefined,
-        inStock: fields.inStock !== undefined ? fields.inStock : true,
-        stockQuantity: fields.stockQuantity,
-        featured: fields.featured || false,
-        trustBadges: fields.trustBadges,
+        inStock: fields.inStock !== undefined ? (fields.inStock as boolean) : true,
+        stockQuantity: fields.stockQuantity as number | undefined,
+        featured: (fields.featured as boolean) || false,
+        trustBadges: fields.trustBadges as string[] | undefined,
     };
 
     return product;
@@ -386,13 +357,6 @@ export const transformProductEntry = (entry: Entry<ContentfulProduct>): Product 
 
 /**
  * BATCH OPERATIONS
- *
- * Efficient bulk fetching operations
- */
-
-/**
- * Fetch multiple products by their IDs
- * More efficient than individual fetches if you have specific IDs
  */
 export const fetchProductsByIds = async (ids: string[]): Promise<Product[]> => {
     if (!ids || ids.length === 0) {
@@ -403,10 +367,7 @@ export const fetchProductsByIds = async (ids: string[]): Promise<Product[]> => {
         const products = await withRetry(async () => {
             const client = getContentfulClient();
 
-            // Fetch all products at once and filter by IDs
-            // Contentful doesn't support OR queries directly in sys.id,
-            // so we fetch and filter client-side
-            const response = await client.getEntries<ContentfulProduct>({
+            const response = await client.getEntries<ProductSkeleton>({
                 content_type: 'product',
                 limit: 1000,
                 include: 2,
@@ -424,21 +385,15 @@ export const fetchProductsByIds = async (ids: string[]): Promise<Product[]> => {
 };
 
 /**
- * EXPORT HELPERS FOR TESTING/DEBUGGING
- *
- * These help during development and testing
- */
-
-/**
- * Get total product count (useful for pagination)
+ * Get total product count
  */
 export const getProductCount = async (): Promise<number> => {
     try {
         const client = getContentfulClient();
-        const response = await client.getEntries<ContentfulProduct>({
+        const response = await client.getEntries<ProductSkeleton>({
             content_type: 'product',
             limit: 1,
-            select: ['sys.id'], // Minimal query for count
+            select: ['sys.id'],
         });
 
         return response.total;
@@ -448,8 +403,7 @@ export const getProductCount = async (): Promise<number> => {
 };
 
 /**
- * Verify Contentful connection and credentials
- * Call this during app initialization to catch configuration issues early
+ * Verify Contentful connection
  */
 export const verifyContentfulConnection = async (): Promise<boolean> => {
     try {
