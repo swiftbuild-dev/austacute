@@ -128,7 +128,7 @@ const Shop = () => {
 
                     {/* Loading State */}
                     {isLoading && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
                                 <div key={i} className="rounded-2xl border border-border/50 overflow-hidden">
                                     <Skeleton className="aspect-square w-full" />
@@ -145,7 +145,7 @@ const Shop = () => {
 
                     {/* Products Grid */}
                     {!isLoading && !error && products && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                             {products.map((product, index) => (
                                 <ProductCard
                                     key={product.id}

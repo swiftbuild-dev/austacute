@@ -36,19 +36,7 @@ export const ProductCard = ({ product, onClick, index = 0 }: ProductCardProps) =
                     {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors duration-300" />
 
-                    {/* Badges */}
-                    <div className="absolute top-3 left-3 flex flex-col gap-2">
-                        {hasDiscount && (
-                            <Badge className="bg-destructive text-white text-xs font-medium px-2 py-1">
-                                -{discountPercentage}%
-                            </Badge>
-                        )}
-                        {product.trustBadges?.[0] && (
-                            <Badge className="bg-primary text-white text-xs font-medium px-2 py-1">
-                                {product.trustBadges[0]}
-                            </Badge>
-                        )}
-                    </div>
+                    
 
                     {/* Stock Status */}
                     {!product.inStock && (

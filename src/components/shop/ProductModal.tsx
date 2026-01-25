@@ -1,23 +1,17 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, Check, Truck, Shield, RotateCcw } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { Product, ProductVariant } from '@/types/shop';
 import { formatPrice } from '@/data/mockProducts';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { WhatsAppOrderButton, WhatsAppInquiryButton } from './WhatsAppOrderButton';
 import {
     Dialog,
     DialogContent,
-    DialogHeader,
-    DialogTitle,
+    DialogClose,
 } from '@/components/ui/dialog';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { WhatsAppOrderButton, WhatsAppInquiryButton } from './WhatsAppOrderButton';
 
 interface ProductModalProps {
     product: Product | null;
@@ -26,240 +20,179 @@ interface ProductModalProps {
 }
 
 export const ProductModal = ({ product, isOpen, onClose }: ProductModalProps) => {
-    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
-        product?.variants?.[0]
-    );
+    const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(undefined);
     const [quantity, setQuantity] = useState(1);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-    // Reset state when product changes
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            onClose();
-            // Reset after close animation
-            setTimeout(() => {
-                setSelectedVariant(product?.variants?.[0]);
-                setQuantity(1);
-                setActiveImageIndex(0);
-            }, 300);
+    // Reset state when product changes or modal opens
+    useEffect(() => {
+        if (product) {
+            setSelectedVariant(product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
+            setQuantity(1);
+            setActiveImageIndex(0);
         }
-    };
+    }, [product, isOpen]);
 
     if (!product) return null;
 
-    const currentPrice = product.price + (selectedVariant?.priceModifier || 0);
     const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
+    const currentPrice = (product.price + (selectedVariant?.priceModifier || 0)) * quantity;
+    const originalPrice = hasDiscount
+        ? (product.compareAtPrice! + (selectedVariant?.priceModifier || 0)) * quantity
+        : null;
 
-    const incrementQuantity = () => setQuantity((q) => Math.min(q + 1, 10));
-    const decrementQuantity = () => setQuantity((q) => Math.max(q - 1, 1));
-
-    const handleVariantChange = (variantName: string) => {
-        const variant = product.variants?.find((v) => v.name === variantName);
-        setSelectedVariant(variant);
-    };
-
-    const trustIndicators = [
-        { icon: Check, text: 'Authentic Product' },
-        { icon: Truck, text: 'Pay on Delivery' },
-        { icon: RotateCcw, text: 'Easy Returns' },
-    ];
+    const discountPercentage = hasDiscount
+        ? Math.round(((product.compareAtPrice! - product.price) / product.compareAtPrice!) * 100)
+        : 0;
 
     return (
-        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto p-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white gap-0 border-none sm:rounded-3xl" hideCloseButton>
+                <div className="grid grid-cols-1 md:grid-cols-2 h-[90vh] md:h-auto md:max-h-[85vh] overflow-y-auto md:overflow-hidden">
+
                     {/* Image Section */}
-                    <div className="relative bg-secondary/30 p-4 md:p-6">
-                        {/* Main Image */}
-                        <div className="relative aspect-square rounded-xl overflow-hidden bg-white">
-                            <AnimatePresence mode="wait">
-                                <motion.img
-                                    key={activeImageIndex}
-                                    src={product.images[activeImageIndex]}
-                                    alt={product.name}
-                                    className="w-full h-full object-cover"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                />
-                            </AnimatePresence>
+                    <div className="relative bg-secondary/20 h-[50vh] md:h-full min-h-[300px] flex items-center justify-center p-6">
+                        <AnimatePresence mode="wait">
+                            <motion.img
+                                key={activeImageIndex}
+                                src={product.images[activeImageIndex]}
+                                alt={product.name}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="w-full h-full object-contain max-h-[400px] mix-blend-multiply"
+                            />
+                        </AnimatePresence>
 
-                            {/* Discount Badge */}
-                            {hasDiscount && (
-                                <Badge className="absolute top-3 left-3 bg-destructive text-white">
-                                    Save {formatPrice(product.compareAtPrice! - product.price)}
-                                </Badge>
-                            )}
-                        </div>
-
-                        {/* Thumbnail Gallery */}
+                        {/* Image Navigation Dots */}
                         {product.images.length > 1 && (
-                            <div className="flex gap-2 mt-4 justify-center">
-                                {product.images.map((image, index) => (
+                            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                                {product.images.map((_, idx) => (
                                     <button
-                                        key={index}
-                                        onClick={() => setActiveImageIndex(index)}
-                                        className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${activeImageIndex === index
-                                            ? 'border-primary ring-2 ring-primary/20'
-                                            : 'border-transparent hover:border-primary/50'
+                                        key={idx}
+                                        onClick={() => setActiveImageIndex(idx)}
+                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === activeImageIndex
+                                            ? 'bg-primary w-4'
+                                            : 'bg-primary/30 hover:bg-primary/50'
                                             }`}
-                                    >
-                                        <img
-                                            src={image}
-                                            alt={`${product.name} view ${index + 1}`}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </button>
+                                    />
                                 ))}
                             </div>
                         )}
+
+
                     </div>
 
-                    {/* Details Section */}
-                    <div className="p-6 md:p-8 flex flex-col">
-                        <DialogHeader className="text-left mb-4">
-                            {/* Category & SKU */}
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                                    {product.category}
-                                </span>
-                                <span className="text-xs text-muted-foreground">•</span>
-                                <span className="text-xs text-muted-foreground">{product.sku}</span>
+                    {/* Content Section */}
+                    <div className="p-6 md:p-8 flex flex-col h-full overflow-y-auto">
+                        <DialogClose className="absolute right-2 top-2 rounded-full opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-50">
+                            <div className="bg-black/5 hover:bg-black/10 rounded-full p-2">
+                                <X className="h-4 w-4" />
+                                <span className="sr-only">Close</span>
                             </div>
+                        </DialogClose>
 
-                            <DialogTitle className="text-2xl md:text-3xl font-serif font-medium text-foreground">
-                                {product.name}
-                            </DialogTitle>
-                        </DialogHeader>
-
-                        {/* Trust Badges */}
-                        {product.trustBadges && product.trustBadges.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {product.trustBadges.map((badge) => (
-                                    <Badge
-                                        key={badge}
-                                        variant="secondary"
-                                        className="text-xs font-normal"
-                                    >
-                                        {badge}
-                                    </Badge>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Price */}
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="text-3xl font-semibold text-primary">
-                                {formatPrice(currentPrice)}
-                            </span>
-                            {hasDiscount && (
-                                <span className="text-lg text-muted-foreground line-through">
-                                    {formatPrice(product.compareAtPrice!)}
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Stock Status */}
-                        <div className="flex items-center gap-2 mb-6">
-                            {product.inStock ? (
-                                <>
-                                    <span className="w-2 h-2 rounded-full bg-green-500" />
-                                    <span className="text-sm text-green-600 font-medium">In Stock</span>
-                                    {product.stockQuantity && product.stockQuantity <= 5 && (
-                                        <span className="text-sm text-amber-600">
-                                            (Only {product.stockQuantity} left!)
-                                        </span>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <span className="w-2 h-2 rounded-full bg-red-500" />
-                                    <span className="text-sm text-red-600 font-medium">Out of Stock</span>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Description */}
                         <div className="mb-6">
-                            <p className="text-muted-foreground leading-relaxed whitespace-pre-line text-sm">
+                            <p className="text-sm text-primary font-medium tracking-wide uppercase mb-2">
+                                {product.category}
+                            </p>
+                            <h2 className="text-2xl md:text-3xl font-serif text-foreground mb-4">
+                                {product.name}
+                            </h2>
+
+                            <div className="flex items-center gap-3 mb-6">
+                                <span className="text-2xl font-bold text-primary">
+                                    {formatPrice(currentPrice)}
+                                </span>
+                                {hasDiscount && originalPrice && (
+                                    <span className="text-lg text-muted-foreground line-through decoration-destructive/30">
+                                        {formatPrice(originalPrice)}
+                                    </span>
+                                )}
+                            </div>
+
+                            <p className="text-muted-foreground leading-relaxed">
                                 {product.description}
                             </p>
                         </div>
 
-                        {/* Variant Selector */}
+                        {/* Variants */}
                         {product.variants && product.variants.length > 0 && (
-                            <div className="mb-4">
-                                <label className="text-sm font-medium text-foreground mb-2 block">
-                                    Size
+                            <div className="mb-6">
+                                <label className="text-sm font-medium text-foreground mb-3 block">
+                                    Select Volume
                                 </label>
-                                <Select
-                                    value={selectedVariant?.name || product.variants[0].name}
-                                    onValueChange={handleVariantChange}
-                                >
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {product.variants.map((variant) => (
-                                            <SelectItem key={variant.name} value={variant.name}>
-                                                {variant.name}
-                                                {variant.priceModifier > 0 && (
-                                                    <span className="text-muted-foreground ml-2">
-                                                        (+{formatPrice(variant.priceModifier)})
-                                                    </span>
-                                                )}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex flex-wrap gap-3">
+                                    {product.variants.map((variant) => (
+                                        <button
+                                            key={variant.name}
+                                            onClick={() => setSelectedVariant(variant)}
+                                            className={`
+                                                relative px-4 py-2 rounded-lg border text-sm font-medium transition-all duration-200
+                                                ${selectedVariant?.name === variant.name
+                                                    ? 'border-primary bg-primary/5 text-primary'
+                                                    : 'border-border hover:border-primary/50 text-muted-foreground'
+                                                }
+                                            `}
+                                        >
+                                            {variant.name}
+                                            {selectedVariant?.name === variant.name && (
+                                                <div className="absolute -top-1.5 -right-1.5 bg-primary text-white p-0.5 rounded-full">
+                                                    <Check className="w-2 h-2" />
+                                                </div>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
-                        {/* Quantity Selector */}
-                        <div className="mb-6">
-                            <label className="text-sm font-medium text-foreground mb-2 block">
+                        {/* Quantity */}
+                        <div className="mb-8">
+                            <label className="text-sm font-medium text-foreground mb-3 block">
                                 Quantity
                             </label>
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={decrementQuantity}
-                                    disabled={quantity <= 1}
-                                    className="w-10 h-10 rounded-lg border border-border flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <Minus className="w-4 h-4" />
-                                </button>
-                                <span className="w-12 text-center font-medium text-lg">{quantity}</span>
-                                <button
-                                    onClick={incrementQuantity}
-                                    disabled={quantity >= 10}
-                                    className="w-10 h-10 rounded-lg border border-border flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                </button>
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center border border-border rounded-lg overflow-hidden">
+                                    <button
+                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                        className="px-4 py-2 hover:bg-secondary/50 transition-colors disabled:opacity-50"
+                                        disabled={quantity <= 1}
+                                    >
+                                        -
+                                    </button>
+                                    <span className="w-12 text-center font-medium">
+                                        {quantity}
+                                    </span>
+                                    <button
+                                        onClick={() => setQuantity(quantity + 1)}
+                                        className="px-4 py-2 hover:bg-secondary/50 transition-colors"
+                                    >
+                                        +
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        {/* CTAs */}
-                        <div className="space-y-3 mt-auto">
+                        <div className="mt-auto space-y-3">
                             <WhatsAppOrderButton
                                 product={product}
                                 selectedVariant={selectedVariant}
                                 quantity={quantity}
+                                fullWidth
+                                className={!product.inStock ? 'opacity-50 pointer-events-none' : ''}
                             />
-                            <WhatsAppInquiryButton product={product} />
-                        </div>
 
-                        {/* Trust Indicators */}
-                        <div className="grid grid-cols-3 gap-2 mt-6 pt-6 border-t border-border">
-                            {trustIndicators.map(({ icon: Icon, text }) => (
-                                <div key={text} className="flex flex-col items-center text-center gap-1">
-                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <Icon className="w-4 h-4 text-primary" />
-                                    </div>
-                                    <span className="text-xs text-muted-foreground">{text}</span>
-                                </div>
-                            ))}
+                            <WhatsAppInquiryButton
+                                product={product}
+                            />
+
+                            {!product.inStock && (
+                                <p className="text-center text-sm text-destructive mt-2">
+                                    Currently out of stock. Use the inquiry button to check restock updates.
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>

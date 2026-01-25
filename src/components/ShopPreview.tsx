@@ -20,7 +20,7 @@ export const ShopPreview = () => {
     const { data: featuredProducts, isLoading, error } = useFeaturedProducts();
 
     // Fallback to mock data if Contentful fails or returns empty
-    const displayProducts = featuredProducts && featuredProducts.length > 0 
+    const displayProducts = featuredProducts && featuredProducts.length > 0
         ? featuredProducts.slice(0, 3)
         : mockProducts.filter((p) => p.featured).slice(0, 3);
 
@@ -84,7 +84,7 @@ export const ShopPreview = () => {
 
                     {/* Loading State */}
                     {isLoading && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
                             {[1, 2, 3].map((i) => (
                                 <div key={i} className="rounded-2xl border border-border/50 overflow-hidden">
                                     <Skeleton className="aspect-square w-full" />
@@ -101,7 +101,7 @@ export const ShopPreview = () => {
 
                     {/* Products Grid */}
                     {!isLoading && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
                             {displayProducts.map((product, index) => (
                                 <ProductCard
                                     key={product.id}
