@@ -35,7 +35,7 @@ export const ShopPreview = () => {
 
     return (
         <>
-            <section id="shop" className="py-24 lg:py-32 bg-gradient-to-b from-primary/5 via-background to-background">
+            <section id="shop" className="py-24 lg:py-18 bg-gradient-to-b from-primary/5 via-background to-background">
                 <div className="container mx-auto px-6">
                     {/* Section Header */}
                     <motion.div

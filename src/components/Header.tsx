@@ -15,9 +15,9 @@ const navLinks: NavLink[] = [
   { name: 'Home', href: '#home' },
   { name: 'Shop', href: '/shop', isRoute: true },
   { name: 'Services', href: '#services' },
-  { name: 'About', href: '#about' },
+  // { name: 'About', href: '#about' },
   { name: 'Testimonials', href: '#testimonials' },
-  { name: 'Contact', href: '#contact' },
+  // { name: 'Contact', href: '#contact' },
 ];
 
 export const Header = () => {

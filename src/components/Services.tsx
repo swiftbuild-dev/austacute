@@ -10,31 +10,31 @@ const services = [
     title: 'Advanced Skincare',
     icon: Sparkles,
     image: heroSkincare,
-    description: 'Experience our medical-grade skincare treatments tailored to your unique skin type. We use proven techniques to rejuvenate, hydrate, and restore your skin\'s natural glow.',
-    link: '#skincare'
+    description: 'Medical-grade skincare tailored to your skin needs.\nTargets acne, dark spots, and uneven tone.'
   },
   {
     title: 'Facial Treatments',
     icon: Flower2,
     image: heroFacial,
-    description: 'Indulge in our relaxing and therapeutic facials. From deep cleansing to anti-aging, our customized treatments address specific concerns for a healthier, more radiant complexion.',
-    link: '#facials'
+    description: 'Relaxing and corrective facials for healthy skin.\nDesigned to cleanse, renew, and boost glow.'
   },
   {
     title: 'Dental Care',
     icon: Stethoscope,
     image: heroDental,
-    description: 'Comprehensive dental services ensuring your smile is as healthy as it is beautiful. We offer routine checkups, cleaning, and cosmetic procedures in a comfortable environment.',
-    link: '#dental'
+    description: 'Professional dental services for total oral health.\nFrom routine cleaning to cosmetic care.'
   }
 ];
+
+
+
 
 export const Services = () => {
   const headerRef = useRef(null);
   const isHeaderInView = useInView(headerRef, { once: true });
 
   return (
-    <section id="services" className="py-24 lg:py-32 bg-background">
+    <section id="services" className="py-18 lg:py-12 bg-background">
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <motion.div
