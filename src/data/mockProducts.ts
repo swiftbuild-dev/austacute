@@ -125,4 +125,4 @@ export const getProductBySlug = (slug: string): Product | undefined => {
 };
 
 // WhatsApp business number
-export const WHATSAPP_NUMBER = '2347060699305';
+export const WHATSAPP_NUMBER = '2347088531785';
