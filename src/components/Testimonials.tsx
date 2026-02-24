@@ -4,45 +4,17 @@ import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const videoTestimonials = [
   {
-    name: 'Ifunanya Nwoye',
-    role: 'Facial Treatment Client',
-    videoUrl: 'https://www.youtube.com/watch?si=h3uihhFluXrTugyG&v=QBQBPn0U4z0&feature=youtu.be',
+    name: 'Happy Client',
+    role: 'Beauty Client',
+    videoUrl: 'https://www.youtube.com/embed/9QWG7BpUuBs',
     quote: 'AustaCute transformed my skin completely! The results are beyond amazing.',
     rating: 5,
   },
   {
-    name: 'Chioma Obi',
-    role: 'Dental Care Patient',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    quote: 'Finally found a dental clinic where I feel comfortable. My smile has never looked better!',
-    rating: 5,
-  },
-  {
-    name: 'Fatima Musa',
-    role: 'Skincare Client',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    quote: 'The personalized skincare regimen worked wonders. My acne is finally under control!',
-    rating: 5,
-  },
-  {
-    name: 'Oghenekevwe Efe',
-    role: 'Luxury Facial Client',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    quote: 'The signature facial experience was pure bliss. Already booked my next appointment!',
-    rating: 5,
-  },
-  {
-    name: 'Chiamaka Okorie',
-    role: 'Cosmetic Dentistry Patient',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    quote: 'Got veneers done here and the results exceeded my expectations. Stunning outcome!',
-    rating: 5,
-  },
-  {
-    name: 'Grace Eze',
-    role: 'Skincare & Facial Client',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    quote: 'Over a year with AustaCute and the quality is remarkable. My skin has never been better!',
+    name: 'Happy Client',
+    role: 'Beauty Client',
+    videoUrl: 'https://www.youtube.com/embed/CiNedaZP8WQ',
+    quote: 'The quality of service is remarkable. I keep coming back for more!',
     rating: 5,
   },
 ];
