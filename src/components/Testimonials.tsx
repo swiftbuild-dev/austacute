@@ -68,11 +68,6 @@ const VideoTestimonialCard = ({ testimonial, index, isActive }: VideoTestimonial
               "{testimonial.quote}"
             </p>
 
-            {/* Author */}
-            <div>
-              <div className="font-bold text-white text-lg">{testimonial.name}</div>
-              <div className="text-sm text-white/80">{testimonial.role}</div>
-            </div>
           </motion.div>
         </div>
       </div>
