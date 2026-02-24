@@ -2,8 +2,7 @@ import { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useFeaturedProducts } from '@/hooks/useContentful';
-import { products as mockProducts } from '@/data/mockProducts';
+import { useAllProducts } from '@/hooks/useContentful';
 import { Product } from '@/types/shop';
 import { ProductCard } from './shop/ProductCard';
 import { ProductModal } from './shop/ProductModal';
@@ -16,13 +15,9 @@ export const ShopPreview = () => {
     const headerRef = useRef(null);
     const isHeaderInView = useInView(headerRef, { once: true });
 
-    // Fetch featured products from Contentful
-    const { data: featuredProducts, isLoading, error } = useFeaturedProducts();
-
-    // Fallback to mock data if Contentful fails or returns empty
-    const displayProducts = featuredProducts && featuredProducts.length > 0
-        ? featuredProducts.slice(0, 3)
-        : mockProducts.filter((p) => p.featured).slice(0, 3);
+    // Fetch all products from Contentful, display first 6
+    const { data: allProducts, isLoading } = useAllProducts();
+    const displayProducts = (allProducts ?? []).slice(0, 6);
 
     const handleProductClick = (product: Product) => {
         setSelectedProduct(product);
@@ -85,7 +80,7 @@ export const ShopPreview = () => {
                     {/* Loading State */}
                     {isLoading && (
                         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
-                            {[1, 2, 3].map((i) => (
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
                                 <div key={i} className="rounded-2xl border border-border/50 overflow-hidden">
                                     <Skeleton className="aspect-square w-full" />
                                     <div className="p-4 space-y-3">
