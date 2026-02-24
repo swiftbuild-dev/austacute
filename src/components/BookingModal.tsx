@@ -46,7 +46,7 @@ Phone: ${formData.phone}
 Business Type: Service - ${formData.service}
 What I need: ${formData.email ? `Email: ${formData.email}` : ''} - Booking Request`;
 
-        const whatsappUrl = `https://wa.me/2347060699305?text=${encodeURIComponent(message.trim())}`;
+        const whatsappUrl = `https://wa.me/2347088531785?text=${encodeURIComponent(message.trim())}`;
 
         window.open(whatsappUrl, '_blank');
         setIsSubmitting(false);
